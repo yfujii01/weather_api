@@ -27,8 +27,6 @@ Things you may want to cover:
 
 * Deployment instructions
 
-* ...
-
 ## heroku
 
 - 環境構築
