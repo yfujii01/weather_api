@@ -6,4 +6,9 @@ class WeatherControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should get tommorow" do
+    get weather_tommorow_url
+    assert_response :success
+  end
+
 end
