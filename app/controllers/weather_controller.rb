@@ -11,7 +11,6 @@ class WeatherController < ApplicationController
 
   def sample
     @tenki = Tenki.new
-    @tenki.aaa = 'あいうえお'
     @tenki.day = '２月１２日'
     @tenki.tenki = 'いかずち'
     @tenki.max = '猛暑'

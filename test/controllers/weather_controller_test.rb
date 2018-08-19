@@ -11,4 +11,9 @@ class WeatherControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should get sample" do
+    get weather_sample_url
+    assert_response :success
+  end
+
 end
