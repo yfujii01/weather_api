@@ -38,12 +38,10 @@ class WeatherController < ApplicationController
   end
 
   def makeTalkText(tk, today)
-    talktext = 'ぴんぽん、' + today + 'の天気をお知らせします。。。'
-    talktext += today + 'の天気は、' + tk.tenki + '。。。'
-    talktext += tk.rain + '。。。'
-    talktext += '最高気温は' + tk.max + '。。。'
-    talktext += '最低気温は' + tk.min + '。。。'
-    # talktext += yesterday + tk.maxdif + '。'
+    talktext = 'ぴんぽん、' + today + 'の天気をお知らせします。'
+    talktext += today + 'の天気は、' + tk.tenki + '。'
+    talktext += tk.rain + '。'
+    talktext += '気温は、' + tk.min + 'から' + tk.max + '。です。'
     talktext += '以上、' + today + 'の天気予報でした'
   end
 
