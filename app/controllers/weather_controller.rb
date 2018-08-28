@@ -24,20 +24,48 @@ class WeatherController < ApplicationController
     css_tenki = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.weather-wrap.clearfix > div.weather-icon > p'
     css_max = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.high-temp.temp'
     css_min = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.low-temp.temp'
+    css_rainAM = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.precip-table > table > tbody > tr.rain-probability > td:nth-child(3)'
+    css_rainPM = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.precip-table > table > tbody > tr.rain-probability > td:nth-child(4)'
+    css_maxdif = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.high-temp.tempdiff'
+    css_mindif = '#main-column > section > div.forecast-days-wrap.clearfix > section.today-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.low-temp.tempdiff'
 
-    get_weather(css_day, css_max, css_min, css_tenki)
+    tk = get_weather(css_day, css_max, css_min, css_tenki, css_rainAM, css_rainPM, css_maxdif, css_mindif)
+
+    today = '今日'
+    talktext = makeTalkText(tk, today)
+
+    render :json => talktext
+  end
+
+  def makeTalkText(tk, today)
+    talktext = 'ぴんぽん、' + today + 'の天気をお知らせします。'
+    talktext += today + 'の天気は、' + tk.tenki + '。'
+    talktext += tk.rain + '。'
+    talktext += '最高気温は' + tk.max + '。'
+    talktext += '最低気温は' + tk.min + '。'
+    # talktext += yesterday + tk.maxdif + '。'
+    talktext += '以上、' + today + 'の天気予報でした'
   end
 
   def tommorow_weather
     css_day = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > h3'
     css_tenki = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.weather-icon > p'
-    css_max = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.high-temp.temp'
-    css_min = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.low-temp.temp'
+    css_max = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.high-temp.temp > span.value'
+    css_min = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.low-temp.temp > span.value'
+    css_rainAM = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.precip-table > table > tbody > tr.rain-probability > td:nth-child(3)'
+    css_rainPM = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.precip-table > table > tbody > tr.rain-probability > td:nth-child(4)'
+    css_maxdif = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.high-temp.tempdiff'
+    css_mindif = '#main-column > section > div.forecast-days-wrap.clearfix > section.tomorrow-weather > div.weather-wrap.clearfix > div.date-value-wrap > dl > dd.low-temp.tempdiff'
 
-    get_weather(css_day, css_max, css_min, css_tenki)
+    tk = get_weather(css_day, css_max, css_min, css_tenki, css_rainAM, css_rainPM, css_maxdif, css_mindif)
+
+    today = '明日'
+    talktext = makeTalkText(tk, today)
+
+    render :json => talktext
   end
 
-  def get_weather(css_day, css_max, css_min, css_tenki)
+  def get_weather(css_day, css_max, css_min, css_tenki, css_rainAM, css_rainPM, css_maxdif, css_mindif)
     require 'selenium-webdriver'
     driver = Selenium::WebDriver.for :chrome, options: headless_chrome_options
 
@@ -52,12 +80,34 @@ class WeatherController < ApplicationController
 
       # 天気
       tenki.tenki = driver.find_element(:css, css_tenki).text
+      tenki.tenki = tenki.tenki.sub(/雨/, 'あめ')
 
       # 最高
       tenki.max = driver.find_element(:css, css_max).text
 
       # 最低
       tenki.min = driver.find_element(:css, css_min).text
+
+      # 降水確率(AM)
+      rainAM = driver.find_element(:css, css_rainAM).text
+
+      # 降水確率(PM)
+      rainPM = driver.find_element(:css, css_rainPM).text
+      if rainAM == rainPM
+        if rainAM == '---'
+          tenki.rain = '降水確率は0%'
+        else
+          tenki.rain = '降水確率は、' + rainAM
+        end
+      else
+        tenki.rain = '降水確率は、午前中が、' + rainAM + '、午後が、' + rainPM
+      end
+
+      # 前日との差(最高気温)
+      tenki.maxdif = driver.find_element(:css, css_maxdif).text
+
+      # 前日との差(最低気温)
+      tenki.mindif = driver.find_element(:css, css_mindif).text
 
     rescue => e
       puts 'エラー発生'
