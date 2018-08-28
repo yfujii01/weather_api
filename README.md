@@ -4,28 +4,15 @@
 
 https://f01weather.herokuapp.com/
 
-## doc
+## USAGE
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+- 今日の天気取得
 
-Things you may want to cover:
+curl https://f01weather.herokuapp.com/today 
 
-* Ruby version
+- 明日の天気取得
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
+curl https://f01weather.herokuapp.com/tommorow 
 
 ## heroku
 
