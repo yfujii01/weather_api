@@ -38,11 +38,11 @@ class WeatherController < ApplicationController
   end
 
   def makeTalkText(tk, today)
-    talktext = 'ぴんぽん、' + today + 'の天気をお知らせします。'
-    talktext += today + 'の天気は、' + tk.tenki + '。'
-    talktext += tk.rain + '。'
-    talktext += '最高気温は' + tk.max + '。'
-    talktext += '最低気温は' + tk.min + '。'
+    talktext = 'ぴんぽん、' + today + 'の天気をお知らせします。。。'
+    talktext += today + 'の天気は、' + tk.tenki + '。。。'
+    talktext += tk.rain + '。。。'
+    talktext += '最高気温は' + tk.max + '。。。'
+    talktext += '最低気温は' + tk.min + '。。。'
     # talktext += yesterday + tk.maxdif + '。'
     talktext += '以上、' + today + 'の天気予報でした'
   end
@@ -84,9 +84,11 @@ class WeatherController < ApplicationController
 
       # 最高
       tenki.max = driver.find_element(:css, css_max).text
+      tenki.max = tenki.max.sub(/℃/, '度')
 
       # 最低
       tenki.min = driver.find_element(:css, css_min).text
+      tenki.min = tenki.min.sub(/℃/, '度')
 
       # 降水確率(AM)
       rainAM = driver.find_element(:css, css_rainAM).text
